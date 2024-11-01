@@ -2,7 +2,7 @@ import unittest
 from src.core.ecs import World
 from src.core.hex_grid import HexCoord
 from src.systems.spawn_system import SpawnSystem
-from src.utils.unit_factory import create_soldier
+from src.factories.unit_factory import create_soldier
 from src.components.unit import Unit
 
 class TestSpawnSystem(unittest.TestCase):

@@ -3,7 +3,7 @@ from ..core.ecs import System, Entity
 from ..components.position import Position
 from ..components.unit import Unit, Combat
 from ..core.hex_grid import HexCoord
-from ..utils.unit_factory import create_soldier
+from ..factories.unit_factory import create_soldier
 
 class SpawnSystem(System):
     def update(self, entities: List[Entity]) -> None:
