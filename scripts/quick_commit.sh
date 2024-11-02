@@ -16,3 +16,4 @@ fi
 git push origin main
 
 # chmod +x quick_commit.sh   
+# ./scripts/quick_commit.sh "test"
