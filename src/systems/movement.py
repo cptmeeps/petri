@@ -1,5 +1,5 @@
 from typing import List, Optional
-from ..core.ecs import System, Entity
+from ..core.ecs import System, Entity, World
 from ..core.hex_grid import HexGrid, HexCoord
 from ..components.position import Position, MovementSpeed, MovementPath
 
