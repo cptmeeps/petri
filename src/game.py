@@ -17,14 +17,18 @@ def main():
     last_turn_time = time.time()
     turn_counter = 0
     
+    # Get the player system using the new method
+    player_system = world.get_system(PlayerSystem)
+    if player_system is None:
+        raise Exception("PlayerSystem not found in world systems.")
+    
     try:
         while True:
             current_time = time.time()
             
             if current_time - last_turn_time >= TURN_DURATION:
                 turn_counter += 1
-                current_player = next(s for s in world.systems 
-                                    if isinstance(s, PlayerSystem)).get_current_player()
+                current_player = player_system.get_current_player()
                 player_name = current_player.get_component(Player).name
                 
                 # Log turn start
@@ -35,8 +39,7 @@ def main():
                 world.update()
                 
                 # Move to next player
-                next(s for s in world.systems 
-                     if isinstance(s, PlayerSystem)).next_turn()
+                player_system.next_turn()
                 last_turn_time = current_time
             
             time.sleep(0.01)

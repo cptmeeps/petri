@@ -24,11 +24,14 @@ class GameSetup:
     
     @staticmethod
     def add_players(world: World, 
-                   player1_name: str = "Player 1", 
-                   player2_name: str = "Player 2",
-                   player1_color: str = "#FF0000",
-                   player2_color: str = "#0000FF") -> Tuple[Entity, Entity]:
-        player_system = next(s for s in world.systems if isinstance(s, PlayerSystem))
+                    player1_name: str = "Player 1", 
+                    player2_name: str = "Player 2",
+                    player1_color: str = "#FF0000",
+                    player2_color: str = "#0000FF") -> Tuple[Entity, Entity]:
+        # Get the player system using the new method
+        player_system = world.get_system(PlayerSystem)
+        if player_system is None:
+            raise Exception("PlayerSystem not found in world systems.")
         
         player1 = player_system.add_player(world, player1_name, player1_color)
         player2 = player_system.add_player(world, player2_name, player2_color)
@@ -37,10 +40,10 @@ class GameSetup:
     
     @staticmethod
     def add_initial_units(world: World, 
-                         player1: Entity, 
-                         player2: Entity,
-                         p1_pos: Optional[HexCoord] = None,
-                         p2_pos: Optional[HexCoord] = None) -> Tuple[Entity, Entity]:
+                          player1: Entity, 
+                          player2: Entity,
+                          p1_pos: Optional[HexCoord] = None,
+                          p2_pos: Optional[HexCoord] = None) -> Tuple[Entity, Entity]:
         p1_pos = p1_pos or HexCoord(0, 0)
         p2_pos = p2_pos or HexCoord(5, 5)
         

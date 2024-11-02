@@ -49,6 +49,13 @@ class World:
         if phase:
             self.phase_systems[phase].append(system)
         
+    def get_system(self, system_type: type) -> Optional[System]:
+        """Retrieve a system by its type."""
+        for system in self.systems:
+            if isinstance(system, system_type):
+                return system
+        return None
+
     def update_phase(self, phase: GamePhase) -> None:
         self.logger.log_phase(phase.name)
         for system in self.phase_systems[phase]:
