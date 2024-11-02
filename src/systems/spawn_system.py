@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from ..core.ecs import System, Entity
 from ..components.position import Position
 from ..components.unit import Unit, Combat
@@ -6,43 +6,29 @@ from ..core.hex_grid import HexCoord
 from ..factories.unit_factory import create_soldier
 
 class SpawnSystem(System):
+    def __init__(self, world: Optional['World'] = None):
+        super().__init__(world)  # Call parent class's __init__
+
     def update(self, entities: List[Entity]) -> None:
-        # Keep track of positions where we've already spawned units this turn
-        spawned_positions = set()
-        new_units = []
+        # Reset just_spawned flag for existing units
+        for entity in entities:
+            unit = entity.get_component(Unit)
+            if unit and unit.just_spawned:
+                unit.just_spawned = False
 
         # Check each entity for spawning
         for entity in entities:
             pos = entity.get_component(Position)
             unit = entity.get_component(Unit)
             
-            if pos and unit and pos.coord not in spawned_positions:
-                # Create a new unit at an adjacent hex
-                neighbors = self.find_empty_neighbor(entities, pos.coord)
-                if neighbors:
-                    # Create new unit with same owner
-                    new_unit = create_soldier(unit.owner_id, neighbors)
-                    new_units.append(new_unit)
-                    spawned_positions.add(neighbors)
-
-        # Add all new units to the entity list
-        entities.extend(new_units)
-
-    def find_empty_neighbor(self, entities: List[Entity], coord: HexCoord) -> HexCoord:
-        from ..core.hex_grid import HexGrid
-        
-        # Get all neighboring positions
-        neighbors = HexGrid.get_neighbors(coord)
-        
-        # Find positions that are already occupied
-        occupied_positions = set()
-        for entity in entities:
-            pos = entity.get_component(Position)
-            if pos:
-                occupied_positions.add(pos.coord)
-        
-        # Filter out occupied positions
-        available_positions = [pos for pos in neighbors if pos not in occupied_positions]
-        
-        # Return first available position or None if none available
-        return available_positions[0] if available_positions else None 
+            # Skip if unit was just spawned
+            if pos and unit and not unit.just_spawned:
+                # Only spawn if the current unit's position is in bounds
+                if not self.world.game_map.in_bounds(pos.coord):
+                    continue
+                    
+                # Create a new unit at the same position
+                new_unit = create_soldier(unit.owner_id, pos.coord)
+                print(f"Creating new unit for owner {unit.owner_id} at {pos.coord}")
+                self.world.add_entity(new_unit)
+                print(f"New unit components: {new_unit.components}")

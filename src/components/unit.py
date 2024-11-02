@@ -3,6 +3,7 @@ from dataclasses import dataclass
 @dataclass
 class Unit:
     owner_id: int  # Player ID who owns this unit
+    just_spawned: bool = True  # New units start with this flag
 
 @dataclass
 class Combat:

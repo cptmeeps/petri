@@ -4,9 +4,10 @@ from ..components.player import Player
 from ..components.unit import Unit
 
 class PlayerSystem(System):
-    def __init__(self):
+    def __init__(self, world):
+        self.world = world
+        self.players = []
         self.current_player_index = 0
-        self.players: List[Entity] = []
 
     def add_player(self, world, name: str, color: str) -> Entity:
         player_id = len(self.players) + 1
@@ -23,6 +24,8 @@ class PlayerSystem(System):
         ]
 
     def next_turn(self) -> None:
+        if not self.players:
+            return
         self.current_player_index = (self.current_player_index + 1) % len(self.players)
 
     def get_current_player(self) -> Optional[Entity]:

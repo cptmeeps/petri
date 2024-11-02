@@ -1,35 +1,15 @@
 import time
-from src.core.ecs import World, Entity
-from src.core.game_phases import GamePhase
-from src.components.position import Position, MovementSpeed
-from src.components.unit import Unit, Combat
-from src.components.player import Player
-from src.systems.movement import MovementSystem
-from src.systems.unit_system import UnitSystem
-from src.core.hex_grid import HexCoord
-from src.systems.spawn_system import SpawnSystem
-from src.systems.player_system import PlayerSystem
-from src.factories.unit_factory import create_soldier
+from src.core.game_setup import GameSetup
 
 def main():
-    world = World()
-    
-    # Initialize systems with phases
-    player_system = PlayerSystem()
-    world.add_system(player_system)
-    world.add_system(MovementSystem(), GamePhase.MOVEMENT)
-    world.add_system(UnitSystem(), GamePhase.COMBAT)
-    world.add_system(SpawnSystem(), GamePhase.SPAWN)
+    # Create game world with systems
+    world = GameSetup.create_game()
     
     # Add players
-    player1 = player_system.add_player(world, "Player 1", "#FF0000")
-    player2 = player_system.add_player(world, "Player 2", "#0000FF")
+    player1, player2 = GameSetup.add_players(world)
     
-    # Create initial units for each player
-    p1_soldier = create_soldier(player1.get_component(Player).id, HexCoord(0, 0))
-    p2_soldier = create_soldier(player2.get_component(Player).id, HexCoord(5, 5))
-    world.add_entity(p1_soldier)
-    world.add_entity(p2_soldier)
+    # Add initial units
+    GameSetup.add_initial_units(world, player1, player2)
     
     TURN_DURATION = 1.0
     last_turn_time = time.time()
@@ -41,14 +21,16 @@ def main():
             
             if current_time - last_turn_time >= TURN_DURATION:
                 turn_counter += 1
-                current_player = player_system.get_current_player()
+                current_player = next(s for s in world.systems 
+                                    if isinstance(s, PlayerSystem)).get_current_player()
                 print(f"\nTurn {turn_counter} - {current_player.get_component(Player).name}'s turn")
                 
                 # Execute all systems in their proper phases
                 world.update()
                 
                 # Move to next player
-                player_system.next_turn()
+                next(s for s in world.systems 
+                     if isinstance(s, PlayerSystem)).next_turn()
                 last_turn_time = current_time
             
             time.sleep(0.01)

@@ -1,7 +1,8 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 from dataclasses import dataclass
 import uuid
 from src.core.game_phases import GamePhase
+from src.core.game_map import GameMap
 
 class Entity:
     def __init__(self):
@@ -15,13 +16,17 @@ class Entity:
         return self.components.get(component_type)
 
 class System:
+    def __init__(self, world: Optional['World'] = None):
+        self.world = world
+
     def update(self, entities: List[Entity]) -> None:
         pass
 
 class World:
-    def __init__(self):
+    def __init__(self, map_width: int = 20, map_height: int = 20):
         self.entities: List[Entity] = []
         self.systems: List[System] = []
+        self.game_map = GameMap(map_width, map_height)
         self.phase_systems: Dict[GamePhase, List[System]] = {
             GamePhase.MOVEMENT: [],
             GamePhase.COMBAT: [],

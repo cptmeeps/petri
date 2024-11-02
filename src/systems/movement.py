@@ -4,7 +4,14 @@ from ..core.hex_grid import HexGrid, HexCoord
 from ..components.position import Position, MovementSpeed, MovementPath
 
 class MovementSystem(System):
+    def __init__(self, world: Optional['World'] = None):
+        super().__init__(world)
+    
     def set_movement_path(self, entity: Entity, target: HexCoord) -> bool:
+        world = self.world
+        if not world.game_map.in_bounds(target):
+            return False
+            
         pos = entity.get_component(Position)
         if not pos:
             return False
