@@ -2,6 +2,7 @@ import time
 from src.core.game_setup import GameSetup
 from src.systems.player_system import PlayerSystem
 from src.components.player import Player
+from src.commands import MoveCommand
 
 def main():
     # Create game world with systems
@@ -34,6 +35,12 @@ def main():
                 # Log turn start
                 world.logger.log_turn(turn_counter, player_name)
                 print(f"\nTurn {turn_counter} - {player_name}'s turn")
+                
+                # Example: Enqueue a move command
+                entity_to_move = ...  # Determine which entity to move
+                target_position = ...  # Determine target position
+                move_command = MoveCommand(entity=entity_to_move, target=target_position)
+                world.enqueue_command(move_command)
                 
                 # Execute all systems in their proper phases
                 world.update()

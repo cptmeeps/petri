@@ -2,33 +2,20 @@ from typing import List, Optional
 from ..core.ecs import System, Entity, World
 from ..core.hex_grid import HexGrid, HexCoord
 from ..components.position import Position, MovementSpeed, MovementPath
+from src.commands import MoveCommand
 
 class MovementSystem(System):
     def __init__(self, world: Optional['World'] = None):
         super().__init__(world)
     
-    def set_movement_path(self, entity: Entity, target: HexCoord) -> bool:
-        world = self.world
-        if not world.game_map.in_bounds(target):
-            return False
-            
-        pos = entity.get_component(Position)
-        if not pos:
-            return False
-            
-        # Calculate path using HexGrid.line
-        path = HexGrid.line(pos.coord, target)
-        
-        # Add or update movement path component
-        path_component = entity.get_component(MovementPath)
-        if path_component:
-            path_component.path = path
-            path_component.current_index = 0
-        else:
-            entity.add_component(MovementPath(path=path, current_index=0))
-        return True
-    
     def update(self, entities: List[Entity]) -> None:
+        # Process MoveCommands
+        commands_to_process = [cmd for cmd in self.world.command_queue if isinstance(cmd, MoveCommand)]
+        for command in commands_to_process:
+            self.process_move_command(command)
+            self.world.command_queue.remove(command)
+
+        # Existing movement logic
         for entity in entities:
             pos = entity.get_component(Position)
             speed = entity.get_component(MovementSpeed)
@@ -54,3 +41,23 @@ class MovementSystem(System):
                     remaining_moves -= distance
                 else:
                     break
+
+    def process_move_command(self, command: MoveCommand) -> None:
+        entity = command.entity
+        target = command.target
+
+        if not self.world.game_map.in_bounds(target):
+            return
+
+        pos = entity.get_component(Position)
+        if not pos:
+            return
+
+        path = HexGrid.line(pos.coord, target)
+
+        path_component = entity.get_component(MovementPath)
+        if path_component:
+            path_component.path = path
+            path_component.current_index = 0
+        else:
+            entity.add_component(MovementPath(path=path, current_index=0))

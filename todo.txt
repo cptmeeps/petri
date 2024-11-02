@@ -16,13 +16,6 @@ Many systems directly access components through entity.get_component(). While no
 Add an event system to reduce direct coupling:
 
 
-Direct Access to Systems
-In src/game.py and src/core/game_setup.py, you're directly accessing specific systems from the world's systems list:
-Why This Is a Concern
-Abstraction Leakage: By directly accessing systems, you're exposing the internal implementation details of the World class. This tight coupling can make your code harder to maintain and extend.
-Responsibility Mixing: The game loop and setup code are taking on responsibilities that might be better encapsulated within the World or higher-level management classes.
-Suggested Improvements
-Encapsulate System Access: Modify the World class to provide methods for interacting with systems. For example:
 
 Systems Exposing Public Methods
 Some systems, like MovementSystem and UnitSystem, expose public methods that are called from outside:

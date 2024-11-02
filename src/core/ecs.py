@@ -4,6 +4,7 @@ import uuid
 from src.core.game_phases import GamePhase
 from src.core.game_map import GameMap
 from src.utils.logger import GameLogger
+from src.commands import Command
 
 class Entity:
     def __init__(self):
@@ -40,6 +41,7 @@ class World:
             GamePhase.SPAWN
         ]
         self.logger = GameLogger()
+        self.command_queue: List[Command] = []
         
     def add_entity(self, entity: Entity) -> None:
         self.entities.append(entity)
@@ -65,3 +67,6 @@ class World:
         # Execute all phases in order
         for phase in self.phase_order:
             self.update_phase(phase)
+
+    def enqueue_command(self, command: 'Command') -> None:
+        self.command_queue.append(command)

@@ -4,6 +4,7 @@ from ..components.unit import Unit, Combat
 from ..components.combat import CombatRange
 from ..components.position import Position
 from ..core.hex_grid import HexCoord, HexGrid
+from src.commands import AttackCommand
 
 class UnitSystem(System):
     def can_attack(self, attacker: Entity, defender: Entity) -> bool:
@@ -51,6 +52,12 @@ class UnitSystem(System):
         return True, damage
 
     def update(self, entities: List[Entity]) -> None:
+        # Process AttackCommands
+        commands_to_process = [cmd for cmd in self.world.command_queue if isinstance(cmd, AttackCommand)]
+        for command in commands_to_process:
+            self.process_attack_command(command)
+            self.world.command_queue.remove(command)
+
         # Remove dead units
         for entity in entities[:]:
             combat = entity.get_component(Combat)
@@ -64,3 +71,8 @@ class UnitSystem(System):
             if entity.get_component(Position) and 
             entity.get_component(Position).coord == coord
         ]
+
+    def process_attack_command(self, command: AttackCommand) -> None:
+        attacker = command.attacker
+        defender = command.defender
+        self.attack(attacker, defender)
