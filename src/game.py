@@ -1,5 +1,7 @@
 import time
 from src.core.game_setup import GameSetup
+from src.systems.player_system import PlayerSystem
+from src.components.player import Player
 
 def main():
     # Create game world with systems
@@ -23,7 +25,11 @@ def main():
                 turn_counter += 1
                 current_player = next(s for s in world.systems 
                                     if isinstance(s, PlayerSystem)).get_current_player()
-                print(f"\nTurn {turn_counter} - {current_player.get_component(Player).name}'s turn")
+                player_name = current_player.get_component(Player).name
+                
+                # Log turn start
+                world.logger.log_turn(turn_counter, player_name)
+                print(f"\nTurn {turn_counter} - {player_name}'s turn")
                 
                 # Execute all systems in their proper phases
                 world.update()
@@ -36,6 +42,7 @@ def main():
             time.sleep(0.01)
             
     except KeyboardInterrupt:
+        world.logger.log_game_end("User terminated the game")
         print("\nGame terminated by user")
 
 if __name__ == "__main__":

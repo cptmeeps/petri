@@ -3,6 +3,7 @@ from dataclasses import dataclass
 import uuid
 from src.core.game_phases import GamePhase
 from src.core.game_map import GameMap
+from src.utils.logger import GameLogger
 
 class Entity:
     def __init__(self):
@@ -38,6 +39,7 @@ class World:
             GamePhase.COMBAT,
             GamePhase.SPAWN
         ]
+        self.logger = GameLogger()
         
     def add_entity(self, entity: Entity) -> None:
         self.entities.append(entity)
@@ -48,6 +50,7 @@ class World:
             self.phase_systems[phase].append(system)
         
     def update_phase(self, phase: GamePhase) -> None:
+        self.logger.log_phase(phase.name)
         for system in self.phase_systems[phase]:
             system.update(self.entities)
 
